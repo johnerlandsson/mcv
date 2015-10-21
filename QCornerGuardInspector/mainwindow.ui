@@ -78,6 +78,9 @@
              <height>100</height>
             </size>
            </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
         </layout>
@@ -90,7 +93,7 @@
          <item>
           <widget class="QTabWidget" name="tbwdgSetup">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tbROI">
             <attribute name="title">
@@ -222,6 +225,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QComboBox" name="cmbValidBarcode"/>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox"/>
          </item>
          <item>
           <widget class="QLCDNumber" name="lcdBarcodeTimeout">

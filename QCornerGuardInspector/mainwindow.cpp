@@ -48,6 +48,9 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
     //Alarms
     ui->tvAlarms->setModel( &tvAlarmsModel );
+    ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 0, QHeaderView::ResizeToContents );
+    ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 1, QHeaderView::Stretch );
+    ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
 
     //Image source
     initCamera();

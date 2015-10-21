@@ -16,6 +16,7 @@ AlarmsTableModel::AlarmsTableModel()
     }
 
     createTables();
+    loadData();
 }
 
 AlarmsTableModel::~AlarmsTableModel()
@@ -43,7 +44,8 @@ void AlarmsTableModel::createTables()
                   "   'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\n"
                   "   'alarm_types_id' INTEGER NOT NULL,\n"
                   "   'ts' DATETIME NOT NULL DEFAULT(CURRENT_TIMESTAMP),\n"
-                  "   'repeat' INTEGER NOT NULL DEFAULT(0)\n"
+                  "   'repeat' INTEGER NOT NULL DEFAULT(0),\n"
+                  "	  'image_data' BLOB\n"
                   ");" );
     if( !res )
         return;
@@ -65,7 +67,7 @@ int AlarmsTableModel::rowCount( const QModelIndex & ) const
 
 int AlarmsTableModel::columnCount( const QModelIndex & ) const
 {
-    return 2;
+    return 3;
 }
 
 QVariant AlarmsTableModel::data( const QModelIndex &index, int role ) const
@@ -107,4 +109,54 @@ bool AlarmsTableModel::setData( const QModelIndex &index, const QVariant &value,
     }
 
     return true;
+}
+
+QVariant AlarmsTableModel::headerData( int section, Qt::Orientation orientation, int role ) const
+{
+    if( orientation != Qt::Horizontal || role != Qt::DisplayRole )
+        return QAbstractTableModel::headerData( section, orientation, role );
+
+    switch( section )
+    {
+        case Timestamp:
+            return "Timestamp";
+        case Message:
+            return "Message";
+        case Repeat:
+            return "Repeat";
+        default:
+            break;
+    }
+
+    return QVariant();
+}
+
+void AlarmsTableModel::loadData()
+{
+    QSqlQuery q;
+    bool res = false;
+
+    res = q.exec( "SELECT 'alarms'.'timestamp', 'alarm_types'.'msg', 'alarms'.'repeat', 'alarms'.'id'\n"
+                  "FROM 'alarms'\n"
+                  "LEFT JOIN 'alarm_types' ON 'alarms'.'alarm_types_id'='alarm_types'.'id';" );
+
+    if( !res )
+        return;
+
+    emit layoutAboutToBeChanged();
+
+    timestamps.clear();
+    messages.clear();
+    repeats.clear();
+    ids.clear();
+
+    while( q.next() )
+    {
+        timestamps << q.value( 0 ).toDateTime();
+        messages << q.value( 1 ).toString();
+        repeats << q.value( 3 ).toInt();
+        ids << q.value( 4 ).toInt();
+    }
+
+    emit layoutChanged();
 }

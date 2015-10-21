@@ -24,10 +24,16 @@ class AlarmsTableModel : public QAbstractTableModel
         int columnCount( const QModelIndex &parent = QModelIndex() ) const;
         QVariant data( const QModelIndex &index, int role ) const;
         bool setData( const QModelIndex &index, const QVariant &value, int role );
+        QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
+
+    private slots:
+        void loadData();
 
     private:
         QList<QDateTime> timestamps;
         QStringList messages;
+        QList<int> repeats;
+        QList<int> ids;
         QSqlDatabase db;
 
     signals:
