@@ -8,14 +8,14 @@
 
 QSharedPointer<mcv::AbstractImageProvider> selectCam()
 {
-    QSharedPointer<mcv::ICubeCamera> ret( new mcv::ICubeCamera( 0 ) );
+    QSharedPointer<mcv::ICubeCamera> ret( new mcv::ICubeCamera( 0 ), &QObject::deleteLater );
 
     return ret;
 }
 
 QSharedPointer<mcv::AbstractImageProvider> selectFiles()
 {
-    QSharedPointer<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader );
+    QSharedPointer<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader, &QObject::deleteLater );
 
     return ret;
 }
