@@ -33,6 +33,8 @@ class MainWindow : public QMainWindow
         void closeEvent( QCloseEvent *e );
         void loadAlarmCheckboxStates();
         void saveAlarmCheckboxStates();
+        void loadBarcodeTimeoutSpinBoxState();
+        void saveBarcodeTimeoutSpinBoxState();
         void resetBarcodeTimeoutCounter();
         void on_hsThreshold_valueChanged(int value);
         void on_actionBarcode_triggered();

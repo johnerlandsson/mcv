@@ -227,7 +227,7 @@
           <widget class="QComboBox" name="cmbValidBarcode"/>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox"/>
+          <widget class="QSpinBox" name="spnBarcodeTimeout"/>
          </item>
          <item>
           <widget class="QLCDNumber" name="lcdBarcodeTimeout">

@@ -30,6 +30,7 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
 
     //Load widget states
     loadAlarmCheckboxStates();
+    loadBarcodeTimeoutSpinBoxState();
 
     connect( &imgproc, SIGNAL( foundValidBarcode() ),
              this, SLOT( resetBarcodeTimeoutCounter() ) );
@@ -144,6 +145,7 @@ void MainWindow::closeEvent( QCloseEvent *e )
    else
    {
        saveAlarmCheckboxStates();
+       saveBarcodeTimeoutSpinBoxState();
        e->accept();
    }
 }
@@ -172,6 +174,18 @@ void MainWindow::saveAlarmCheckboxStates()
     s.setValue( "AlarmCheckboxStates/InvalidBarcode", ui->chkInvalidBarcode->isChecked() );
     s.setValue( "AlarmCheckboxStates/InvalidProfile", ui->chkInvalidProfile->isChecked() );
     s.setValue( "AlarmCheckboxStates/MissingHole", ui->chkMissingHole->isChecked() );
+}
+
+void MainWindow::loadBarcodeTimeoutSpinBoxState()
+{
+    QSettings s;
+    ui->spnBarcodeTimeout->setValue( s.value( "BarcodeSpinBoxState/BarcodeTimeout", 10 ).toInt() );
+}
+
+void MainWindow::saveBarcodeTimeoutSpinBoxState()
+{
+    QSettings s;
+    s.setValue( "BarcodeSpinBoxState/BarcodeTimeout", ui->spnBarcodeTimeout->value() );
 }
 
 void MainWindow::resetBarcodeTimeoutCounter()
