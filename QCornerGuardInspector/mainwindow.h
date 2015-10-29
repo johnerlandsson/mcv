@@ -3,7 +3,9 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <memory>
 #include <mcv/ICubeCamera.h>
+#include <mcv/AbstractImageProvider.h>
 #include "imageprocessor.h"
 #include "barcodesettings.h"
 #include "camerasettings.h"
@@ -12,16 +14,19 @@
 #include <QStringListModel>
 #include "alarmstablemodel.h"
 
+
 namespace Ui {
 class MainWindow;
 }
+
+typedef std::shared_ptr<mcv::AbstractImageProvider> P_ImgSrc;
 
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
 
     public:
-        explicit MainWindow( QWidget *parent = 0 );
+        explicit MainWindow( QWidget *parent = 0, P_ImgSrc imgsrc = P_ImgSrc() );
         ~MainWindow();
 
     private slots:
@@ -43,14 +48,11 @@ class MainWindow : public QMainWindow
         void on_actionHole_triggered();
 
     private:
-        void setupImageSource();
-        void initCamera();
-
         Ui::MainWindow *ui;
         QTimer secondsTimer;
         QTimer imageDisplayTimer;
         int barcodeTimeoutCounter;
-        mcv::ICubeCamera cam;
+//        mcv::ICubeCamera cam;
         ImageProcessor imgproc;
         BarcodeSettings barcode_settings;
         CameraSettings camera_settings;
@@ -58,6 +60,7 @@ class MainWindow : public QMainWindow
         HoleSettings hole_settings;
         QStringListModel cmbValidBarcodeModel;
         AlarmsTableModel tvAlarmsModel;
+        P_ImgSrc imageSource;
 };
 
 #endif // MAINWINDOW_H

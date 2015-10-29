@@ -4,23 +4,26 @@
 #include <mcv/ImageFileLoader.h>
 #include <QCommandLineParser>
 #include <iostream>
-#include <QSharedPointer>
+#include <memory>
 
-QSharedPointer<mcv::AbstractImageProvider> selectCam()
+std::shared_ptr<mcv::AbstractImageProvider> selectCam()
 {
-    QSharedPointer<mcv::ICubeCamera> ret( new mcv::ICubeCamera( 0 ), &QObject::deleteLater );
+    std::shared_ptr<mcv::ICubeCamera> ret( new mcv::ICubeCamera( 0 ) );
+    ret->init();
+    ret->setExposure( 1.0f );
 
     return ret;
 }
 
-QSharedPointer<mcv::AbstractImageProvider> selectFiles()
+std::shared_ptr<mcv::AbstractImageProvider> selectFiles()
 {
-    QSharedPointer<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader, &QObject::deleteLater );
+    std::shared_ptr<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader( "/home/john/Pictures", 300 ) );
+    ret->setExtensions( { ".jpg", ".png" } );
 
     return ret;
 }
 
-QSharedPointer<mcv::AbstractImageProvider> selectImageSource( QString src )
+std::shared_ptr<mcv::AbstractImageProvider> selectImageSource( QString src )
 {
     if( src == "cam" )
         return selectCam();
@@ -56,8 +59,16 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    auto imgSrc = selectImageSource( inputSource );
+
+    imgSrc->open();
+
     MainWindow w;
     w.show();
 
-    return a.exec();
+    int ret = a.exec();
+
+    imgSrc->close();
+
+    return ret;
 }

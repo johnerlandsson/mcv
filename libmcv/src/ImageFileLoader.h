@@ -10,6 +10,7 @@
 
 #include "AbstractImageProvider.h"
 #include <chrono>
+#include <thread>
 
 namespace mcv
 {
@@ -31,6 +32,7 @@ class ImageFileLoader : public AbstractImageProvider
 		std::vector<std::string> _valid_file_extensions;
 		std::vector<std::string> _filenames;
 		std::vector<std::string>::iterator _current_filename;
+		std::thread _caller_thread;
 		bool _run;
 
 		void caller();

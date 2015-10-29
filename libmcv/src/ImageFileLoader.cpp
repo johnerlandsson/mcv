@@ -6,7 +6,6 @@
  */
 
 #include "ImageFileLoader.h"
-#include <future>
 #include <opencv2/opencv.hpp>
 
 extern "C"
@@ -41,6 +40,10 @@ void ImageFileLoader::open()
 		{
 			std::string filename{ dir->d_name };
 
+			//Handle . and ..
+			if( filename.size() < 3 )
+				continue;
+
 			//Extract extension part of filename
 			auto pp = filename.end();
 			for( auto c = pp; c != filename.begin(); c-- )
@@ -60,6 +63,10 @@ void ImageFileLoader::open()
 		}
 		_current_filename = _filenames.begin();
 		closedir( d );
+	}
+	else
+	{
+		throw std::runtime_error( "Failed to open dir: " + _path );
 	}
 }
 
@@ -92,14 +99,26 @@ void ImageFileLoader::caller()
 	auto f = next_frame();
 	_process_function( f );
 
+
 	//Call again
 	if( _run )
-		std::async( &ImageFileLoader::caller, this );
+	{
+		std::thread t( std::bind( &ImageFileLoader::caller, this ) );
+		t.detach();
+	}
+//	if( _run )
+//		std::async( std::launch::async, &ImageFileLoader::caller, this );
 }
 
 cv::Mat ImageFileLoader::next_frame()
 {
-	return cv::imread( *_current_filename++, CV_LOAD_IMAGE_UNCHANGED );
+	if( _current_filename >= _filenames.end() )
+		return cv::Mat();
+
+	if( (++_current_filename) >= _filenames.end() )
+		_current_filename = _filenames.begin();
+
+	return cv::imread( _path + *_current_filename, CV_LOAD_IMAGE_UNCHANGED );
 }
 
 } /* namespace mcv */

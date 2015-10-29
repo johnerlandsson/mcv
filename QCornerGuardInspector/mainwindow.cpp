@@ -8,7 +8,7 @@
 #include "holesettingsdialog.h"
 #include <QMessageBox>
 
-MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }
+MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }, imageSource{ imgsrc }
 {
     ui->setupUi( this );
 
@@ -54,14 +54,12 @@ MainWindow::MainWindow( QWidget *parent ) : QMainWindow( parent ), ui( new Ui::M
     ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
 
     //Image source
-    initCamera();
+    imageSource->setProcessFunction( &imgproc );
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-
-    cam.close();
 }
 
 void MainWindow::setEnableWidgetsRunStop( bool stop )
@@ -107,12 +105,13 @@ void MainWindow::on_buttStartStop_toggled( bool checked )
         }
 
         startProcessing();
-        setupImageSource();
-        cam.start();
+//        setupImageSource();
+//        cam.start();
+        imageSource->start();
     }
     else
     {
-        cam.stop();
+        imageSource->stop();
     }
 
     setEnableWidgetsRunStop( checked );
@@ -192,22 +191,6 @@ void MainWindow::resetBarcodeTimeoutCounter()
 {
     barcodeTimeoutCounter = barcode_settings.timeout_s;
     ui->lcdBarcodeTimeout->display( barcodeTimeoutCounter );
-}
-
-void MainWindow::setupImageSource()
-{
-    cam.setExposure( camera_settings.exposure_time );
-    auto r = camera_settings.roi;
-    if( r.width > 0 && r.height > 0 && r.x >= 0 && r.y >= 0 )
-        cam.setROI( r );
-}
-
-void MainWindow::initCamera()
-{
-    cam.init();
-    cam.setProcessFunction( &imgproc );
-    cam.open();
-    cam.setup();
 }
 
 void MainWindow::on_hsThreshold_valueChanged( int value )
