@@ -6,19 +6,100 @@
  */
 
 #include "ImageFileLoader.h"
+#include <future>
+#include <opencv2/opencv.hpp>
+
+extern "C"
+{
+#include <dirent.h>
+}
 
 namespace mcv
 {
 
-ImageFileLoader::ImageFileLoader()
+ImageFileLoader::ImageFileLoader( std::string folder_path, int delay_ms ) : _delay{ delay_ms }, _path{ folder_path }, _run{ false }
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 ImageFileLoader::~ImageFileLoader()
 {
-	// TODO Auto-generated destructor stub
+}
+
+void ImageFileLoader::open()
+{
+	_filenames.clear();
+
+	if( _path.back() != '/' )
+		_path.push_back( '/' );
+
+	DIR *d = ::opendir( _path.c_str() );
+	struct dirent *dir = nullptr;
+
+	if( d )
+	{
+		while( (dir = ::readdir( d )) )
+		{
+			std::string filename{ dir->d_name };
+
+			//Extract extension part of filename
+			auto pp = filename.end();
+			for( auto c = pp; c != filename.begin(); c-- )
+				if( *c == '.' )
+					pp = c;
+			if( pp == filename.begin() )
+				continue;
+
+			for( auto ext : _valid_file_extensions )
+			{
+				if( std::string( pp, filename.end() ) == ext )
+				{
+					_filenames.push_back( filename );
+					break;
+				}
+			}
+		}
+		_current_filename = _filenames.begin();
+		closedir( d );
+	}
+}
+
+void ImageFileLoader::close()
+{
+}
+
+void ImageFileLoader::start()
+{
+	_run = true;
+	caller();
+}
+
+void ImageFileLoader::stop()
+{
+	_run = false;
+}
+
+void ImageFileLoader::setExtensions( const std::initializer_list<std::string> ext )
+{
+	_valid_file_extensions = ext;
+}
+
+void ImageFileLoader::caller()
+{
+	//Delay
+	std::this_thread::sleep_for( _delay );
+
+	//Process
+	auto f = next_frame();
+	_process_function( f );
+
+	//Call again
+	if( _run )
+		std::async( &ImageFileLoader::caller, this );
+}
+
+cv::Mat ImageFileLoader::next_frame()
+{
+	return cv::imread( *_current_filename++, CV_LOAD_IMAGE_UNCHANGED );
 }
 
 } /* namespace mcv */

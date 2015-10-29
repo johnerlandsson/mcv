@@ -14,6 +14,16 @@ AbstractImageProvider::AbstractImageProvider()
 {
 }
 
+AbstractImageProvider::AbstractImageProvider( ProcessFunction f )
+{
+	setProcessFunction( f );
+}
+
+AbstractImageProvider::AbstractImageProvider( AbstractImageProcessor *p )
+{
+	setProcessFunction( p );
+}
+
 AbstractImageProvider::~AbstractImageProvider()
 {
 }

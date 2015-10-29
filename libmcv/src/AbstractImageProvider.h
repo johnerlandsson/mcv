@@ -21,6 +21,8 @@ class AbstractImageProvider
 {
 	public:
 		AbstractImageProvider();
+		AbstractImageProvider( ProcessFunction f );
+		AbstractImageProvider( AbstractImageProcessor *p );
 		virtual ~AbstractImageProvider();
 		virtual void open() = 0;
 		virtual void close() = 0;
