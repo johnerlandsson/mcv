@@ -17,7 +17,7 @@ std::shared_ptr<mcv::AbstractImageProvider> selectCam()
 
 std::shared_ptr<mcv::AbstractImageProvider> selectFiles()
 {
-    std::shared_ptr<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader( "/home/john/Pictures", 300 ) );
+    std::shared_ptr<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader( "/home/john/dev/mcv_workspace/images", 100 ) );
     ret->setExtensions( { ".jpg", ".png" } );
 
     return ret;
@@ -60,10 +60,16 @@ int main(int argc, char *argv[])
     }
 
     auto imgSrc = selectImageSource( inputSource );
+    if( !imgSrc )
+    {
+        std::cerr << "Invalid image source. Exiting..." << std::endl;
+        return 1;
+    }
+
 
     imgSrc->open();
 
-    MainWindow w;
+    MainWindow w( 0, imgSrc );
     w.show();
 
     int ret = a.exec();

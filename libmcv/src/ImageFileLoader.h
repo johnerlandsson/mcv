@@ -18,6 +18,7 @@ namespace mcv
 class ImageFileLoader : public AbstractImageProvider
 {
 	public:
+		ImageFileLoader();
 		ImageFileLoader( std::string folder_path, int delay_ms );
 		virtual ~ImageFileLoader();
 		void open();
@@ -25,6 +26,8 @@ class ImageFileLoader : public AbstractImageProvider
 		void start();
 		void stop();
 		void setExtensions( const std::initializer_list<std::string> ext );
+		void setFolderPath( const std::string path );
+		void setDelay( const std::chrono::milliseconds delay );
 
 	private:
 		std::chrono::milliseconds _delay;

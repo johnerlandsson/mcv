@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <memory>
-#include <mcv/ICubeCamera.h>
 #include <mcv/AbstractImageProvider.h>
 #include "imageprocessor.h"
 #include "barcodesettings.h"
@@ -46,13 +45,16 @@ class MainWindow : public QMainWindow
         void on_actionCamera_triggered();
         void on_actionGeneral_triggered();
         void on_actionHole_triggered();
+        void validateBarcode( const QString data );
+
+    signals:
+        void barcode_timeout_alarm();
 
     private:
         Ui::MainWindow *ui;
         QTimer secondsTimer;
         QTimer imageDisplayTimer;
         int barcodeTimeoutCounter;
-//        mcv::ICubeCamera cam;
         ImageProcessor imgproc;
         BarcodeSettings barcode_settings;
         CameraSettings camera_settings;
@@ -61,6 +63,7 @@ class MainWindow : public QMainWindow
         QStringListModel cmbValidBarcodeModel;
         AlarmsTableModel tvAlarmsModel;
         P_ImgSrc imageSource;
+        bool barcodeTimeoutAlarmRaised;
 };
 
 #endif // MAINWINDOW_H

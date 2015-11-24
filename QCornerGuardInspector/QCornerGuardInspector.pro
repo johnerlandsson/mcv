@@ -45,7 +45,7 @@ FORMS    += mainwindow.ui \
     generalsettingsdialog.ui \
     holesettingsdialog.ui
 
-LIBS += -L../lib -lqmcv -lmcv -lNETUSBCAM -lopencv_core -lopencv_highgui -lopencv_imgproc
+LIBS += -L../lib -lqmcv -lmcv -lNETUSBCAM -lopencv_core -lopencv_highgui -lopencv_imgproc -lzbar
 INCLUDEPATH += ../include/
 
 RESOURCES += \

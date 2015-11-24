@@ -8,7 +8,7 @@
 #include "holesettingsdialog.h"
 #include <QMessageBox>
 
-MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }, imageSource{ imgsrc }
+MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }, imageSource{ imgsrc }, barcodeTimeoutAlarmRaised{ false }
 {
     ui->setupUi( this );
 
@@ -32,8 +32,8 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
     loadAlarmCheckboxStates();
     loadBarcodeTimeoutSpinBoxState();
 
-    connect( &imgproc, SIGNAL( foundValidBarcode() ),
-             this, SLOT( resetBarcodeTimeoutCounter() ) );
+    connect( &imgproc, SIGNAL( foundBarcode( const QString ) ),
+             this, SLOT( validateBarcode( const QString )) );
 
     //Load settings
     barcode_settings.load();
@@ -83,7 +83,14 @@ void MainWindow::everySecond()
     if( ui->buttStartStop->isChecked() )
     {
         if( barcodeTimeoutCounter > 0 && ui->chkBarcodeTimeout->isChecked() )
+        {
             ui->lcdBarcodeTimeout->display( --barcodeTimeoutCounter );
+        }
+        else if( !barcodeTimeoutAlarmRaised )
+        {
+            emit barcode_timeout_alarm();
+            barcodeTimeoutAlarmRaised = true;
+        }
     }
 }
 
@@ -105,8 +112,6 @@ void MainWindow::on_buttStartStop_toggled( bool checked )
         }
 
         startProcessing();
-//        setupImageSource();
-//        cam.start();
         imageSource->start();
     }
     else
@@ -178,7 +183,9 @@ void MainWindow::saveAlarmCheckboxStates()
 void MainWindow::loadBarcodeTimeoutSpinBoxState()
 {
     QSettings s;
-    ui->spnBarcodeTimeout->setValue( s.value( "BarcodeSpinBoxState/BarcodeTimeout", 10 ).toInt() );
+    int value = s.value( "BarcodeSpinBoxState/BarcodeTimeout", 10 ).toInt();
+    ui->spnBarcodeTimeout->setValue( value );
+    ui->lcdBarcodeTimeout->display( value );
 }
 
 void MainWindow::saveBarcodeTimeoutSpinBoxState()
@@ -189,7 +196,8 @@ void MainWindow::saveBarcodeTimeoutSpinBoxState()
 
 void MainWindow::resetBarcodeTimeoutCounter()
 {
-    barcodeTimeoutCounter = barcode_settings.timeout_s;
+//    barcodeTimeoutCounter = barcode_settings.timeout_s;
+    barcodeTimeoutCounter = ui->spnBarcodeTimeout->value();
     ui->lcdBarcodeTimeout->display( barcodeTimeoutCounter );
 }
 
@@ -231,4 +239,13 @@ void MainWindow::on_actionHole_triggered()
     HoleSettingsDialog d;
     if( d.exec() == QDialog::Accepted )
         hole_settings = d.settings;
+}
+
+void MainWindow::validateBarcode( const QString data )
+{
+    QString validBarcode = cmbValidBarcodeModel.stringList()[ui->cmbValidBarcode->currentIndex()];
+    if( data == validBarcode )
+        resetBarcodeTimeoutCounter();
+
+    //TODO raise alarm
 }

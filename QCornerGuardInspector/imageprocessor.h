@@ -3,6 +3,7 @@
 
 #include <mcv/AbstractImageProcessor.h>
 #include <QObject>
+#include <zbar.h>
 
 class ImageProcessor : public QObject, public mcv::AbstractImageProcessor
 {
@@ -11,9 +12,13 @@ class ImageProcessor : public QObject, public mcv::AbstractImageProcessor
         ImageProcessor( QObject *parent = 0 );
         virtual ~ImageProcessor();
         void process( cv::Mat &input_frame );
+        void checkBarcode( cv::Mat &cvframe );
+
+   private:
+        zbar::ImageScanner scanner;
 
     signals:
-        void foundValidBarcode();
+        void foundBarcode( const QString data );
 };
 
 #endif // IMAGEPROCESSOR_H

@@ -15,6 +15,9 @@ extern "C"
 
 namespace mcv
 {
+ImageFileLoader::ImageFileLoader() : _delay{ std::chrono::milliseconds{ 300 } }, _run{ false }
+{
+}
 
 ImageFileLoader::ImageFileLoader( std::string folder_path, int delay_ms ) : _delay{ delay_ms }, _path{ folder_path }, _run{ false }
 {
@@ -90,6 +93,16 @@ void ImageFileLoader::setExtensions( const std::initializer_list<std::string> ex
 	_valid_file_extensions = ext;
 }
 
+void ImageFileLoader::setFolderPath( const std::string path )
+{
+	_path = path;
+}
+
+void ImageFileLoader::setDelay(	const std::chrono::milliseconds delay )
+{
+	_delay = delay;
+}
+
 void ImageFileLoader::caller()
 {
 	//Delay
@@ -112,7 +125,7 @@ void ImageFileLoader::caller()
 
 cv::Mat ImageFileLoader::next_frame()
 {
-	if( _current_filename >= _filenames.end() )
+	if( _current_filename == _filenames.end() )
 		return cv::Mat();
 
 	if( (++_current_filename) >= _filenames.end() )
@@ -122,3 +135,5 @@ cv::Mat ImageFileLoader::next_frame()
 }
 
 } /* namespace mcv */
+
+

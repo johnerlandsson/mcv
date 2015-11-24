@@ -12,3 +12,6 @@ libmcv/.project
 libmcv/.settings/
 .metadata
 /images
+iltest
+QCornerGuardInspector/.cproject
+QCornerGuardInspector/.project
