@@ -17,6 +17,14 @@ class AlarmsTableModel : public QAbstractTableModel
             Repeat = 2
         };
 
+        enum AlarmTypes
+        {
+            BarcodeTimeout = 1,
+            InvalidBarcode = 2,
+            MissingHole = 3,
+            InvalidProfile = 4
+        };
+
         AlarmsTableModel();
         virtual ~AlarmsTableModel();
         void createTables();
@@ -28,12 +36,17 @@ class AlarmsTableModel : public QAbstractTableModel
 
     private slots:
         void loadData();
+        void raiseBarcodeTimeoutAlarm();
 
     private:
+        void incrementLastRepeat();
+        void addAlarm(const AlarmTypes type );
+        QString AlarmMessage( const AlarmTypes type ) const;
+
         QList<QDateTime> timestamps;
-        QStringList messages;
         QList<int> repeats;
         QList<int> ids;
+        QList<int> typeids;
         QSqlDatabase db;
 
     signals:

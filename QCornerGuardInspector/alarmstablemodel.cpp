@@ -2,10 +2,11 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QSqlError>
+#include <iostream>
+#include <QSqlError>
 
 AlarmsTableModel::AlarmsTableModel()
 {
-//    db.addDatabase( "QSQLITE" );
     db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setDatabaseName( "QCornerGuardInspector_alarms.db" );
     if( !db.open() )
@@ -82,7 +83,9 @@ QVariant AlarmsTableModel::data( const QModelIndex &index, int role ) const
             case Timestamp:
                 return timestamps[index.row()];
             case Message:
-                return messages[index.row()];
+                return AlarmMessage( (AlarmTypes)typeids[index.row()] );
+            case Repeat:
+                return repeats[index.row()];
             default:
                 break;
         }
@@ -102,8 +105,9 @@ bool AlarmsTableModel::setData( const QModelIndex &index, const QVariant &value,
             timestamps[index.row()] = value.toDateTime();
             break;
         case Message:
-            messages[index.row()] = value.toString();
             break;
+        case Repeat:
+            repeats[index.row()] = value.toInt();
         default:
             return false;
     }
@@ -136,27 +140,81 @@ void AlarmsTableModel::loadData()
     QSqlQuery q;
     bool res = false;
 
-    res = q.exec( "SELECT 'alarms'.'timestamp', 'alarm_types'.'msg', 'alarms'.'repeat', 'alarms'.'id'\n"
+    res = q.exec( "SELECT 'alarms'.'ts', 'alarms'.'repeat', 'alarms'.'id', 'alarms'.'alarm_types_id'\n"
                   "FROM 'alarms'\n"
-                  "LEFT JOIN 'alarm_types' ON 'alarms'.'alarm_types_id'='alarm_types'.'id';" );
-
+                  "ORDER BY 'alarms'.'ts' DESC\n"
+                  "LIMIT 20;" );
     if( !res )
         return;
 
     emit layoutAboutToBeChanged();
 
     timestamps.clear();
-    messages.clear();
     repeats.clear();
     ids.clear();
+    typeids.clear();
 
     while( q.next() )
     {
         timestamps << q.value( 0 ).toDateTime();
-        messages << q.value( 1 ).toString();
-        repeats << q.value( 3 ).toInt();
-        ids << q.value( 4 ).toInt();
+        repeats << q.value( 1 ).toInt();
+        ids << q.value( 2 ).toInt();
+        typeids << q.value( 3 ).toInt();
     }
 
     emit layoutChanged();
+}
+
+void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
+{
+    if( ids.size() > 0 && typeids.front() == BarcodeTimeout )
+        incrementLastRepeat();
+    else
+        addAlarm( BarcodeTimeout );
+}
+
+void AlarmsTableModel::incrementLastRepeat()
+{
+    repeats.front()++;
+
+    QSqlQuery q;
+    q.prepare( "UPDATE alarms SET repeat=? WHERE id=?;");
+    q.bindValue( 1, repeats.front() );
+    q.bindValue( 2, ids.front() );
+    q.exec();
+
+    emit layoutChanged();
+}
+
+void AlarmsTableModel::addAlarm( const AlarmTypes type )
+{
+    QSqlQuery q;
+    q.prepare( "INSERT INTO 'alarms' (alarm_types_id, repeat) VALUES(?, 1);" );
+    q.bindValue( 0, (int)type );
+    if( q.exec() )
+    {
+        ids.prepend( q.lastInsertId().toInt() );
+        typeids.prepend( type );
+        repeats.prepend( 1 );
+        timestamps.prepend( QDateTime::currentDateTime() );
+    }
+
+    emit layoutChanged();
+}
+
+QString AlarmsTableModel::AlarmMessage( const AlarmTypes type ) const
+{
+    switch( type )
+    {
+        case BarcodeTimeout:
+            return QString( "Barcode timeout" );
+        case InvalidBarcode:
+            return QString( "Invlid barcode" );
+        case MissingHole:
+            return QString( "Missing hole" );
+        case InvalidProfile:
+            return QString( "Invlid profile" );
+        default:
+            return QString();
+    }
 }

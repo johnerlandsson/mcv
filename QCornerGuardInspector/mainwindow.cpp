@@ -52,6 +52,7 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
     ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 0, QHeaderView::ResizeToContents );
     ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 1, QHeaderView::Stretch );
     ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
+    connect( this, SIGNAL( barcode_timeout_alarm() ), &tvAlarmsModel, SLOT( raiseBarcodeTimeoutAlarm() ) );
 
     //Image source
     imageSource->setProcessFunction( &imgproc );
@@ -113,6 +114,7 @@ void MainWindow::on_buttStartStop_toggled( bool checked )
 
         startProcessing();
         imageSource->start();
+        barcodeTimeoutAlarmRaised = false;
     }
     else
     {
@@ -196,7 +198,6 @@ void MainWindow::saveBarcodeTimeoutSpinBoxState()
 
 void MainWindow::resetBarcodeTimeoutCounter()
 {
-//    barcodeTimeoutCounter = barcode_settings.timeout_s;
     barcodeTimeoutCounter = ui->spnBarcodeTimeout->value();
     ui->lcdBarcodeTimeout->display( barcodeTimeoutCounter );
 }
