@@ -41,6 +41,7 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
     camera_settings.load();
     general_settings.load();
     on_hsThreshold_valueChanged( general_settings.threshold );
+    loadHsThresholdState();
     hole_settings.load();
 
     //Valid barcodes combo box
@@ -53,6 +54,9 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
     ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 1, QHeaderView::Stretch );
     ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
     connect( this, SIGNAL( barcode_timeout_alarm() ), &tvAlarmsModel, SLOT( raiseBarcodeTimeoutAlarm() ) );
+    connect( this, SIGNAL( invalid_barcode_alarm() ), &tvAlarmsModel, SLOT( raiseInvalidBarcodeTimeoutAlarm() ) );
+
+    connect( ui->tabWidget, SIGNAL( currentChanged(int) ), this, SLOT( tab_switched( int ) ) );
 
     //Image source
     imageSource->setProcessFunction( &imgproc );
@@ -75,8 +79,7 @@ void MainWindow::setEnableWidgetsRunStop( bool stop )
     ui->menuFile->setEnabled( !stop );
     ui->menuSettings->setEnabled( !stop );
 
-    //tab widget
-    ui->tabWidget->setEnabled( !stop );
+    ui->tvAlarms->setEnabled( !stop );
 }
 
 void MainWindow::everySecond()
@@ -99,6 +102,10 @@ void MainWindow::startProcessing()
 {
     resetBarcodeTimeoutCounter();
     ui->lcdBarcodeTimeout->display( barcodeTimeoutCounter );
+    imageSource->start();
+    barcodeTimeoutAlarmRaised = false;
+    imgproc.setGeneralSettings( general_settings );
+    imgproc.setHoleSettings( hole_settings );
 }
 
 void MainWindow::on_buttStartStop_toggled( bool checked )
@@ -113,8 +120,6 @@ void MainWindow::on_buttStartStop_toggled( bool checked )
         }
 
         startProcessing();
-        imageSource->start();
-        barcodeTimeoutAlarmRaised = false;
     }
     else
     {
@@ -196,6 +201,11 @@ void MainWindow::saveBarcodeTimeoutSpinBoxState()
     s.setValue( "BarcodeSpinBoxState/BarcodeTimeout", ui->spnBarcodeTimeout->value() );
 }
 
+void MainWindow::loadHsThresholdState()
+{
+    ui->hsThreshold->setValue( general_settings.threshold );
+}
+
 void MainWindow::resetBarcodeTimeoutCounter()
 {
     barcodeTimeoutCounter = ui->spnBarcodeTimeout->value();
@@ -205,6 +215,8 @@ void MainWindow::resetBarcodeTimeoutCounter()
 void MainWindow::on_hsThreshold_valueChanged( int value )
 {
     ui->lblThreshold->setText( QString( "%1" ).arg( value ) );
+    general_settings.threshold = value;
+    imgproc.setGeneralSettings( general_settings );
 }
 
 void MainWindow::on_actionBarcode_triggered()
@@ -232,6 +244,7 @@ void MainWindow::on_actionGeneral_triggered()
     {
         general_settings = d.settings;
         on_hsThreshold_valueChanged( general_settings.threshold );
+        ui->hsThreshold->setValue( general_settings.threshold );
     }
 }
 
@@ -247,6 +260,16 @@ void MainWindow::validateBarcode( const QString data )
     QString validBarcode = cmbValidBarcodeModel.stringList()[ui->cmbValidBarcode->currentIndex()];
     if( data == validBarcode )
         resetBarcodeTimeoutCounter();
+    else
+        emit invalid_barcode_alarm();
 
-    //TODO raise alarm
+    ui->statusBar->showMessage( QString( "Last barcode: " ) + data );
+}
+
+void MainWindow::tab_switched( int index )
+{
+    if( index == 1 )
+        imgproc.setMode( ImageProcessor::Mode::Threshold );
+    else
+        imgproc.setMode( ImageProcessor::Mode::Normal );
 }

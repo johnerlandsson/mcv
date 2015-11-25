@@ -173,6 +173,14 @@ void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
         addAlarm( BarcodeTimeout );
 }
 
+void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
+{
+    if( ids.size() > 0 && typeids.front() == InvalidBarcode )
+        incrementLastRepeat();
+    else
+        addAlarm( InvalidBarcode );
+}
+
 void AlarmsTableModel::incrementLastRepeat()
 {
     repeats.front()++;

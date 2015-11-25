@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     generalsettingsdialog.cpp \
     holesettings.cpp \
     holesettingsdialog.cpp \
-    alarmstablemodel.cpp
+    alarmstablemodel.cpp \
+    point_operations.cpp
 
 HEADERS  += mainwindow.h \
     imageprocessor.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
     generalsettingsdialog.h \
     holesettings.h \
     holesettingsdialog.h \
-    alarmstablemodel.h
+    alarmstablemodel.h \
+    point_operations.h
 
 FORMS    += mainwindow.ui \
     barcodesettingsdialog.ui \

@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow
         void saveAlarmCheckboxStates();
         void loadBarcodeTimeoutSpinBoxState();
         void saveBarcodeTimeoutSpinBoxState();
+        void loadHsThresholdState();
         void resetBarcodeTimeoutCounter();
         void on_hsThreshold_valueChanged(int value);
         void on_actionBarcode_triggered();
@@ -46,9 +47,11 @@ class MainWindow : public QMainWindow
         void on_actionGeneral_triggered();
         void on_actionHole_triggered();
         void validateBarcode( const QString data );
+        void tab_switched( int index );
 
     signals:
         void barcode_timeout_alarm();
+        void invalid_barcode_alarm();
 
     private:
         Ui::MainWindow *ui;
