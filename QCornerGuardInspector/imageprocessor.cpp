@@ -77,6 +77,7 @@ void ImageProcessor::setGeneralSettings( GeneralSettings s )
     {
         cv::Mat of;
         cv::cvtColor( input_frame, of, CV_GRAY2BGR );
+        static int nMissingHolesInARow = 0;
 
         //Find largest blob in image
         auto profile = findProfile( thresh_frame, gs );
@@ -96,13 +97,32 @@ void ImageProcessor::setGeneralSettings( GeneralSettings s )
             return;
         }
 
+        //Check for row with different amount of holes in it.
+        int maxNHoles = 0;
+        int minNHoles = 100;
+        for( auto row : sortedPoints )
+        {
+            if( row.size() > maxNHoles )
+                maxNHoles = row.size();
+            if( row.size() < minNHoles )
+                minNHoles = row.size();
+        }
+
+
         //Check distances and draw lines between holes
-        if( !checkDrawHoles( sortedPoints, of, hs.max_cc_deviation ) )
-    {
-        emit missingHole();
-        setOutputFrame( of );
-        return;
-    }
+        if( !checkDrawHoles( sortedPoints, of, hs.max_cc_deviation ) || (maxNHoles - minNHoles) >= 2 )
+        {
+            nMissingHolesInARow++;
+            if( nMissingHolesInARow == hs.n_error_frames )
+                emit missingHole();
+
+            setOutputFrame( of );
+            return;
+        }
+        else
+        {
+            nMissingHolesInARow = 0;
+        }
 
     setOutputFrame( of );
 }

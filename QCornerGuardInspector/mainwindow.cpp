@@ -228,6 +228,7 @@ void MainWindow::on_hsThreshold_valueChanged( int value )
     ui->lblThreshold->setText( QString( "%1" ).arg( value ) );
     general_settings.threshold = value;
     imgproc.setGeneralSettings( general_settings );
+    general_settings.save();
 }
 
 void MainWindow::on_actionBarcode_triggered()
@@ -287,6 +288,10 @@ void MainWindow::tab_switched( int index )
 
 void MainWindow::on_actionShutdown_triggered()
 {
-    QProcess::startDetached( "shutdown -P now" );
-    close();
+    if( QMessageBox::question( nullptr, "Shutdown", "Are you sure that you want to shutdown the computer?",
+                               QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+    {
+        QProcess::startDetached( "shutdown -P now" );
+        close();
+    }
 }

@@ -213,7 +213,7 @@ void AlarmsTableModel::raiseMissingHoleAlarm()
     if( !missingHoleEnabled )
         return;
 
-    if( ids.size() > 0 && typeids.front() == InvalidBarcode )
+    if( ids.size() > 0 && typeids.front() == MissingHole )
         incrementLastRepeat();
     else
         addAlarm( MissingHole );
