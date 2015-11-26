@@ -70,7 +70,8 @@ int main(int argc, char *argv[])
     imgSrc->open();
 
     MainWindow w( 0, imgSrc );
-    w.show();
+//    w.show();
+    w.showFullScreen();
 
     int ret = a.exec();
 

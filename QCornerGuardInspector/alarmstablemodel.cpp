@@ -5,7 +5,7 @@
 #include <iostream>
 #include <QSqlError>
 
-AlarmsTableModel::AlarmsTableModel()
+AlarmsTableModel::AlarmsTableModel() : barcodeTimeoutEnabled{ true }, invalidBarcodeEnabled{ true }, missingHoleEnabled{ true }, invalidProfileEnabled{ true }
 {
     db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setDatabaseName( "QCornerGuardInspector_alarms.db" );
@@ -135,6 +135,27 @@ QVariant AlarmsTableModel::headerData( int section, Qt::Orientation orientation,
     return QVariant();
 }
 
+void AlarmsTableModel::setAlarmEnabled( const AlarmTypes type, const bool enabled )
+{
+    switch( type )
+    {
+        case BarcodeTimeout:
+            barcodeTimeoutEnabled = enabled;
+            break;
+        case InvalidBarcode:
+            invalidBarcodeEnabled = enabled;
+            break;
+        case MissingHole:
+            missingHoleEnabled = enabled;
+            break;
+        case InvalidProfile:
+            invalidProfileEnabled = enabled;
+            break;
+        default:
+            break;
+    }
+}
+
 void AlarmsTableModel::loadData()
 {
     QSqlQuery q;
@@ -167,6 +188,9 @@ void AlarmsTableModel::loadData()
 
 void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
 {
+    if( !barcodeTimeoutEnabled )
+        return;
+
     if( ids.size() > 0 && typeids.front() == BarcodeTimeout )
         incrementLastRepeat();
     else
@@ -175,6 +199,9 @@ void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
 
 void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
 {
+    if( !invalidBarcodeEnabled )
+        return;
+
     if( ids.size() > 0 && typeids.front() == InvalidBarcode )
         incrementLastRepeat();
     else
@@ -183,10 +210,24 @@ void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
 
 void AlarmsTableModel::raiseMissingHoleAlarm()
 {
+    if( !missingHoleEnabled )
+        return;
+
     if( ids.size() > 0 && typeids.front() == InvalidBarcode )
         incrementLastRepeat();
     else
         addAlarm( MissingHole );
+}
+
+void AlarmsTableModel::raiseInvalidProfileAlarm()
+{
+    if( !invalidProfileEnabled )
+        return;
+
+    if( ids.size() > 0 && typeids.front() == InvalidProfile )
+        incrementLastRepeat();
+    else
+        addAlarm( InvalidProfile );
 }
 
 void AlarmsTableModel::incrementLastRepeat()

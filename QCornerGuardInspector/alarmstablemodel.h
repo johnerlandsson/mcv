@@ -33,12 +33,14 @@ class AlarmsTableModel : public QAbstractTableModel
         QVariant data( const QModelIndex &index, int role ) const;
         bool setData( const QModelIndex &index, const QVariant &value, int role );
         QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
+        void setAlarmEnabled( const AlarmTypes type, const bool enabled );
 
     private slots:
         void loadData();
         void raiseBarcodeTimeoutAlarm();
         void raiseInvalidBarcodeTimeoutAlarm();
         void raiseMissingHoleAlarm();
+        void raiseInvalidProfileAlarm();
 
     private:
         void incrementLastRepeat();
@@ -50,6 +52,10 @@ class AlarmsTableModel : public QAbstractTableModel
         QList<int> ids;
         QList<int> typeids;
         QSqlDatabase db;
+        bool barcodeTimeoutEnabled;
+        bool invalidBarcodeEnabled;
+        bool missingHoleEnabled;
+        bool invalidProfileEnabled;
 
     signals:
 

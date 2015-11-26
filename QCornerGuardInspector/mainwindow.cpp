@@ -7,14 +7,14 @@
 #include "generalsettingsdialog.h"
 #include "holesettingsdialog.h"
 #include <QMessageBox>
+#include <QProcess>
 
 MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }, imageSource{ imgsrc }, barcodeTimeoutAlarmRaised{ false }
 {
     ui->setupUi( this );
 
     //Setup seconds timer
-    connect( &secondsTimer, SIGNAL( timeout() ),
-             this, SLOT( everySecond() ) );
+    connect( &secondsTimer, SIGNAL( timeout() ), this, SLOT( everySecond() ) );
     secondsTimer.start( 1000 );
 
     //Timer to update glwidget
@@ -22,11 +22,13 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
               this, SLOT( updateImageDisplay() ) );
     imageDisplayTimer.start( 33 );
 
-    //Adjust size proportions of left splitter
+    //Adjust size proportions of splitter
     QList<int> sizes;
-    sizes.append( 1000 );
-    sizes.append( 100 );
+    sizes.append( 150 );
+    sizes.append( 1 );
     ui->splitter->setSizes( sizes );
+
+    ui->tabWidget->setCurrentIndex( 0 );
 
     //Load widget states
     loadAlarmCheckboxStates();
@@ -56,6 +58,7 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
     connect( this, SIGNAL( barcode_timeout_alarm() ), &tvAlarmsModel, SLOT( raiseBarcodeTimeoutAlarm() ) );
     connect( this, SIGNAL( invalid_barcode_alarm() ), &tvAlarmsModel, SLOT( raiseInvalidBarcodeTimeoutAlarm() ) );
     connect( &imgproc, SIGNAL( missingHole() ), &tvAlarmsModel, SLOT( raiseMissingHoleAlarm() ) );
+    connect( &imgproc, SIGNAL( invalidProfile() ), &tvAlarmsModel, SLOT( raiseInvalidProfileAlarm() ) );
 
     connect( ui->tabWidget, SIGNAL( currentChanged(int) ), this, SLOT( tab_switched( int ) ) );
 
@@ -81,6 +84,7 @@ void MainWindow::setEnableWidgetsRunStop( bool stop )
     ui->menuSettings->setEnabled( !stop );
 
     ui->tvAlarms->setEnabled( !stop );
+    ui->cmbValidBarcode->setEnabled( !stop );
 }
 
 void MainWindow::everySecond()
@@ -107,6 +111,12 @@ void MainWindow::startProcessing()
     barcodeTimeoutAlarmRaised = false;
     imgproc.setGeneralSettings( general_settings );
     imgproc.setHoleSettings( hole_settings );
+
+    //Enable/disable alarms
+    tvAlarmsModel.setAlarmEnabled( AlarmsTableModel::BarcodeTimeout, ui->chkBarcodeTimeout->isChecked() );
+    tvAlarmsModel.setAlarmEnabled( AlarmsTableModel::InvalidBarcode, ui->chkInvalidBarcode->isChecked() );
+    tvAlarmsModel.setAlarmEnabled( AlarmsTableModel::MissingHole, ui->chkMissingHole->isChecked() );
+    tvAlarmsModel.setAlarmEnabled( AlarmsTableModel::InvalidProfile, ui->chkInvalidProfile->isChecked() );
 }
 
 void MainWindow::on_buttStartStop_toggled( bool checked )
@@ -273,4 +283,10 @@ void MainWindow::tab_switched( int index )
         imgproc.setMode( ImageProcessor::Mode::Threshold );
     else
         imgproc.setMode( ImageProcessor::Mode::Normal );
+}
+
+void MainWindow::on_actionShutdown_triggered()
+{
+    QProcess::startDetached( "shutdown -P now" );
+    close();
 }

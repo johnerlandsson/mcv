@@ -99,7 +99,7 @@ class ImageProcessor : public QObject, public mcv::AbstractImageProcessor
          */
         mcv::Blob findProfile( const cv::Mat1b &threshFrame, GeneralSettings s );
 
-        /* Find hole centerpoints
+        /* Find hole centerpoints and draw them on an output image
          * @param[in] profile. A blob representing the profile.
          * @param[in][out] outFrame. Image to paint centerpoints onto.
          * @param[in] s Hole settings object.
@@ -111,11 +111,25 @@ class ImageProcessor : public QObject, public mcv::AbstractImageProcessor
          *
          */
         QVector<QVector<cv::Point>> findDrawHoles(const mcv::Blob &profile , cv::Mat outframe, HoleSettings s);
+
+        /* Find hole centerpoints, Filter out small and "unround" holes.
+         * @param[in] profile Blob object containing the holes.
+         * @param[in] s Hole settings object containing the parameters for filtering
+         *
+         * \return A vector of filtered points
+         */
         QVector<cv::Point> findHoles(const mcv::Blob &profile , HoleSettings s);
+
+        /* Split a vecor of points into rows of vectors of points
+         * @param[in] points. Vector of points to split.
+         * @param[in] max_y_dev. Threshold of delta y that makes a new line.
+         *
+         * \return A vector of vectors of points, sorted from top to bottom. the rows ar sorted from left to right.
+         */
         QVector<QVector<cv::Point>> splitHolesByRow( QVector<cv::Point> &points, const double max_y_dev );
 
-        zbar::ImageScanner scanner;
-        Mode mode;
+        zbar::ImageScanner scanner; /* !<Zbar scanner that looks for barcodes in a zbar image*/
+        Mode mode; /* !<Enum describing the process mode. */
         GeneralSettings general_settings;
         QMutex general_settings_mutex;
         HoleSettings hole_settings;
@@ -125,6 +139,7 @@ class ImageProcessor : public QObject, public mcv::AbstractImageProcessor
         void foundBarcode( const QString data );
         void missingHole();
         void noHolesInProfile();
+        void invalidProfile();
 };
 
 #endif // IMAGEPROCESSOR_H

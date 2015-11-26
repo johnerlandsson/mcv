@@ -80,6 +80,12 @@ void ImageProcessor::setGeneralSettings( GeneralSettings s )
 
         //Find largest blob in image
         auto profile = findProfile( thresh_frame, gs );
+        if( !profile.isValid() )
+        {
+            emit invalidProfile();
+            setOutputFrame( of );
+            return;
+        }
 
         //Locate the centerpoints of all holes in blob and draw points on output image
         auto sortedPoints = findDrawHoles( profile, of, hs );
