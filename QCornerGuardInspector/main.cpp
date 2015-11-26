@@ -17,7 +17,7 @@ std::shared_ptr<mcv::AbstractImageProvider> selectCam()
 
 std::shared_ptr<mcv::AbstractImageProvider> selectFiles()
 {
-    std::shared_ptr<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader( "/home/john/dev/mcv_workspace/images", 100 ) );
+    std::shared_ptr<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader( "/home/john/dev/mcv_workspace/images", 300 ) );
     ret->setExtensions( { ".jpg", ".png" } );
 
     return ret;

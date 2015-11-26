@@ -55,6 +55,7 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
     ui->tvAlarms->horizontalHeader()->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
     connect( this, SIGNAL( barcode_timeout_alarm() ), &tvAlarmsModel, SLOT( raiseBarcodeTimeoutAlarm() ) );
     connect( this, SIGNAL( invalid_barcode_alarm() ), &tvAlarmsModel, SLOT( raiseInvalidBarcodeTimeoutAlarm() ) );
+    connect( &imgproc, SIGNAL( missingHole() ), &tvAlarmsModel, SLOT( raiseMissingHoleAlarm() ) );
 
     connect( ui->tabWidget, SIGNAL( currentChanged(int) ), this, SLOT( tab_switched( int ) ) );
 

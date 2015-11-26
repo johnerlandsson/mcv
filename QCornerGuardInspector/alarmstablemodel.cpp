@@ -181,6 +181,14 @@ void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
         addAlarm( InvalidBarcode );
 }
 
+void AlarmsTableModel::raiseMissingHoleAlarm()
+{
+    if( ids.size() > 0 && typeids.front() == InvalidBarcode )
+        incrementLastRepeat();
+    else
+        addAlarm( MissingHole );
+}
+
 void AlarmsTableModel::incrementLastRepeat()
 {
     repeats.front()++;

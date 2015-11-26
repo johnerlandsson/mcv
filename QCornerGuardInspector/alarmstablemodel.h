@@ -38,6 +38,7 @@ class AlarmsTableModel : public QAbstractTableModel
         void loadData();
         void raiseBarcodeTimeoutAlarm();
         void raiseInvalidBarcodeTimeoutAlarm();
+        void raiseMissingHoleAlarm();
 
     private:
         void incrementLastRepeat();
