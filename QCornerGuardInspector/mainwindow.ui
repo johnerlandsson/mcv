@@ -57,7 +57,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tbAlarms">
         <attribute name="title">
@@ -80,6 +80,12 @@
            </property>
            <property name="alternatingRowColors">
             <bool>true</bool>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
            </property>
           </widget>
          </item>
@@ -188,16 +194,20 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="grpAlarms">
+       <widget class="QGroupBox" name="grpBarcode">
         <property name="title">
-         <string>Alarms</string>
+         <string>Barcode</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <widget class="QComboBox" name="cmbValidBarcode"/>
          </item>
          <item>
-          <widget class="QSpinBox" name="spnBarcodeTimeout"/>
+          <widget class="QSpinBox" name="spnBarcodeTimeout">
+           <property name="suffix">
+            <string>s</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLCDNumber" name="lcdBarcodeTimeout">
@@ -209,6 +219,15 @@
            </property>
           </widget>
          </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="grpAlarms">
+        <property name="title">
+         <string>Alarms</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QCheckBox" name="chkBarcodeTimeout">
            <property name="text">
