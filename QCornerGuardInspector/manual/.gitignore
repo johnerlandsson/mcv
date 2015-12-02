@@ -1,3 +1,9 @@
 /tmp/
 /document.pdf
 /document.synctex.gz
+.document.tex.swp
+.document.toc
+document.toc
+document.log
+document.pdf
+document.aux
