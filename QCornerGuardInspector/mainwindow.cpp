@@ -108,6 +108,7 @@ void MainWindow::startProcessing()
 {
     resetBarcodeTimeoutCounter();
     ui->lcdBarcodeTimeout->display( barcodeTimeoutCounter );
+    std::cout << "Starting image source" << std::endl;
     imageSource->start();
     barcodeTimeoutAlarmRaised = false;
     imgproc.setGeneralSettings( general_settings );

@@ -5,6 +5,7 @@
 #include <QtAlgorithms>
 #include <point_operations.h>
 #include <mcv/contour_operations.h>
+#include <iostream>
 
 ImageProcessor::ImageProcessor( QObject *parent ) : QObject( parent ), mode( Mode::Normal )
 {
@@ -19,6 +20,7 @@ ImageProcessor::~ImageProcessor()
 
 void ImageProcessor::process( cv::Mat &input_frame )
 {
+    std::cout << "ImageProcessor::process" << std::endl;
     //Copy settings for thread safety
     general_settings_mutex.lock();
     GeneralSettings gs = general_settings;

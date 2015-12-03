@@ -10,7 +10,10 @@ std::shared_ptr<mcv::AbstractImageProvider> selectCam()
 {
     std::shared_ptr<mcv::ICubeCamera> ret( new mcv::ICubeCamera( 0 ) );
     ret->init();
+    ret->open();
+    ret->setup();
     ret->setExposure( 1.0f );
+    ret->setROI( cv::Rect( 200, 200, 800, 600 ) );
 
     return ret;
 }
@@ -19,6 +22,7 @@ std::shared_ptr<mcv::AbstractImageProvider> selectFiles()
 {
     std::shared_ptr<mcv::ImageFileLoader> ret( new mcv::ImageFileLoader( "/home/john/dev/mcv_workspace/images", 300 ) );
     ret->setExtensions( { ".jpg", ".png" } );
+    ret->open();
 
     return ret;
 }
@@ -66,8 +70,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-
-    imgSrc->open();
 
     MainWindow w( 0, imgSrc );
     w.show();

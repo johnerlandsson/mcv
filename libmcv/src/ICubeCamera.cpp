@@ -59,6 +59,7 @@ void ICubeCamera::start()
 {
 	//Read image size from camera. Needed by callback function.
 	_sz = imageSize();
+	std::cout << "ICubeCamera::start" << std::endl;
 
 	int rv = NETUSBCAM_Start( _cam_index );
 	if( rv != ICubeCameraError::ICSuccess )
@@ -77,6 +78,8 @@ int ICubeCamera::cb( void *buffer, unsigned int lBufferSize, void *this_ptr )
 {
 	ICubeCamera *instance = static_cast<ICubeCamera *>(this_ptr);
 	cv::Mat frame( instance->_sz, CV_8UC1, buffer, instance->_sz.width );
+
+	std::cout << "ICubeCamera::cb" << std::endl;
 
 	if( frame.data )
 		instance->_process_function( frame );
