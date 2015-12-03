@@ -195,6 +195,8 @@ void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
         incrementLastRepeat();
     else
         addAlarm( BarcodeTimeout );
+
+    emit barcodeRelatedAlarmRaised();
 }
 
 void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
@@ -206,6 +208,8 @@ void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
         incrementLastRepeat();
     else
         addAlarm( InvalidBarcode );
+
+    emit barcodeRelatedAlarmRaised();
 }
 
 void AlarmsTableModel::raiseMissingHoleAlarm()
@@ -217,6 +221,8 @@ void AlarmsTableModel::raiseMissingHoleAlarm()
         incrementLastRepeat();
     else
         addAlarm( MissingHole );
+
+    emit holeRelatedAlarmRaised();
 }
 
 void AlarmsTableModel::raiseInvalidProfileAlarm()

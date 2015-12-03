@@ -8,6 +8,9 @@
 \usepackage[swedish]{babel}
 \usepackage{float}
 
+%Motverka föräldralösa rader
+\widowpenalty=10000
+
 %Översätt Figure i captions
 \addto\captionsswedish{\renewcommand{\figurename}{Bild}}
 
@@ -20,6 +23,8 @@
 %Försättsblad
 \pagenumbering{gobble}
 \maketitle
+\vspace{100mm}
+Senast ändrad: \today
 \newpage
 
 %Innehållsförteckning
@@ -77,16 +82,17 @@
 			\includegraphics[width=25mm]{barcode_settings}
 			\caption{Inställningar sträckkod}
 		\end{wrapfigure}
-		Under rubriken Barcode hittar man en rullgardinsmeny innehållande förvalda sträckkoder. Om kameran ser en annan sträckkod än den som är vald kommer larmet Invalid Barcode (se kapitel \ref{subsec:invalid_barcode}).
+		Under rubriken \textbf{Barcode} hittar man en rullgardinsmeny innehållande förvalda sträckkoder. Om programmet detekterar en annan sträckkod än den som är vald kommer larmet 
+		Invalid Barcode (se kapitel \ref{subsec:invalid_barcode}) aktiveras.
 		Information om hur man lägger till fler sträckkoder finns i kapitel \ref{subsec:barcode}.\newline
 		I stegningsrutan väljer man hur många sekunder som går från det att kameran ser en giltig sträckkod tills dess att den larmar för timeout sträckkod (se kapitel \ref{subsec:barcode_timeout}).\newline
 		I LCD displayen under stegningsrutan ser man återstående tid när kameran är startad.
 	      }
 
 	\vbox{\subsection{Åtgärder vid uppstart}
-	    När maskinen är startad och profilen passerar igenom kameralådan behöver kontrollera två stycken inställningar. 
-	    Det kan vara en bra ide att stänga av samtliga larm innan man gör dessa inställningar. 
-	    Kryssa ur samtliga rutor under rubriken alarm. Därefter justerar man bländaren och tröskelvärdet.
+	    När maskinen är startad och profilen passerar igenom kameralådan behöver man kontrollera två stycken inställningar. 
+	    Det kan vara en bra ide att stänga av alla larm innan man gör dessa inställningar. 
+	    Kryssa ur samtliga rutor under rubriken \textbf{Alarms}. Därefter justerar man bländaren och tröskelvärdet.
 	    \subsubsection{Checklista uppstart}
 		    \vbox{ %Tillåt inte att listan delas upp på två olika sidor
 		    \begin{itemize}
@@ -113,14 +119,14 @@
 		\includegraphics[width=0.7\textwidth]{alarm_list}
 		\caption{Larmlista}\label{fig:alarm_list}
 	\end{figure}
-	Timestamp är tidpunkten då larmet först aktiverades. Message innehåller information om vilket larm som avses. Repeat visar hur många gånger i rad det larmet har aktiverats.
+	\textit{Timestamp} är tidpunkten då larmet först aktiverades. \textit{Message} innehåller information om vilket larm som avses. \textit{Repeat} visar hur många gånger i rad det larmet har aktiverats.
 
 	\subsection{Timeout sträckkod}\label{subsec:barcode_timeout}
-		Programmet letar efter en sträckkod i varje bild som kommer ifrån kameran. En timer räknar ner varje sekund.
-		När en giltig sträckkod hittas i bilden återställs timern till sitt förinställda värde.
+		Programmet letar efter en sträckkod i varje bild som kommer från kameran. En timer räknar ner varje sekund.
+		När en giltig sträckkod hittas i bilden återställs timern till sitt förinställda värde. Larmet aktiveras när timern räknat ner till 0.
 
 	\subsection{Ogiltlig sträckkod}\label{subsec:invalid_barcode}
-		Detta larmet aktiveras när en annan sträckkod än den förvalda upptäcks i en bild.
+		Detta larm aktiveras när en annan sträckkod än den förvalda upptäcks i en bild.
 
 	\subsection{Hål saknas}\label{subsec:missing_hole}
 		Aktiveras när programmet upptäcker att det horisontella avståndet mellan två hål avviker från de andra hålavstånden på den raden.
@@ -128,7 +134,7 @@
 		på ett sådant sätt att tejpen blir en del av profilen.
 
 	\subsection{Ogiltlig profil}\label{subsec:invalid_profile}
-	Detta larmet aktiveras när programmet inte hittar en profil i bilden. Det kan bero på att profilen inte längre matas genom lådan, om det blivit fel på kameran eller om parametern \textit{min\_profile\_area}
+	Detta larm aktiveras när programmet inte hittar en profil i bilden. Det kan bero på att profilen inte längre matas genom lådan, om det blivit fel på kameran eller om parametern \textit{min\_profile\_area}
 	är ställd för högt (se kapitel \ref{subsubsec:min_profile_area}).
 
 \section{Inställningar}
@@ -153,9 +159,22 @@
 		  Höjden på vår region of interest.
 
 	\subsection{Hål}
+		När hålen detekterats filtreras de efter area och cirkuläritet. Därefter sorteras de in i rader, sedan sorteras de från vänster till höger.
+		Efter att de sorterats mäts centrum-centrum avstånden mellan hålen på respektive rad. Medelavståndet räknas fram och därefter söker programmet igenom
+		centrum-centrum avstånden igen och jämför mot medelavståndet. \newline\newline
+		Cirkuläriteten räknas ut genom att mäta avståndet från hålets mest vänstra pixel till den längst till höger. Sedan räknar man ut arean på hålet $a_h$ och 
+		arean på en perfekt cirkel med en diameter motsvarande hålets maximala bredd $a_p$. Cirkuläriteten räknas sedan ut med $\frac{a_p}{a_h}$. En perfekt cirkel har då en cirkuläritet på 1.0.
+
 	  \subsubsection{Maximal avvikelse Y}
+	  	Parametern \textit{max\_y\_dev} representerar hur många gånger medelavståndet i Y koordinat ett hål måste avvika från medel för att det skall
+		räknas som en ny rad.
+
 	  \subsubsection{Minimal cirkularitet}
+	    	Parametern \textit{min\_circularity} representerar den lägsta accepterade cirkuläriteten ett hål får ha. Samtliga hål med lägre cirkuläritet filtreras bort.
+	  	
 	  \subsubsection{Maximal cirkularitet}
+	  	Parametern \textit{max\_circularity} representerar den högsta accepterade cirkuläriteten ett hål får ha. Samtliga hål med en högre cirkuläritet filtreras bort.
+
 	\subsection{Allmänt}
 	  \vbox{\subsubsection{Tröskelvärde}\label{subsubsec:threshold}
 		\begin{wrapfigure}{R}{3cm}

@@ -5,4 +5,7 @@
         <file>icons/add_48.png</file>
         <file>icons/remove_48.png</file>
     </qresource>
+    <qresource prefix="/manual">
+        <file>manual/document.pdf</file>
+    </qresource>
 </RCC>

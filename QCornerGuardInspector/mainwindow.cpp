@@ -8,6 +8,7 @@
 #include "holesettingsdialog.h"
 #include <QMessageBox>
 #include <QProcess>
+#include <QDesktopServices>
 
 MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }, imageSource{ imgsrc }, barcodeTimeoutAlarmRaised{ false }
 {
