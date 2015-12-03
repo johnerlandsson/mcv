@@ -8,6 +8,8 @@ QT       += core gui opengl sql
 
 CONFIG += c++11 console
 
+#DEFINES += USE_IO
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = QCornerGuardInspector
@@ -26,7 +28,9 @@ SOURCES += main.cpp\
     holesettings.cpp \
     holesettingsdialog.cpp \
     alarmstablemodel.cpp \
-    point_operations.cpp
+    point_operations.cpp \
+    io.cpp \
+    PCI7260.cpp
 
 HEADERS  += mainwindow.h \
     imageprocessor.h \
@@ -39,7 +43,9 @@ HEADERS  += mainwindow.h \
     holesettings.h \
     holesettingsdialog.h \
     alarmstablemodel.h \
-    point_operations.h
+    point_operations.h \
+    io.h \
+    PCI7260.h
 
 FORMS    += mainwindow.ui \
     barcodesettingsdialog.ui \

@@ -44,7 +44,7 @@
    <item row="1" column="1">
     <widget class="QSpinBox" name="spnMinProfileArea">
      <property name="maximum">
-      <number>9999</number>
+      <number>999999</number>
      </property>
     </widget>
    </item>
@@ -58,7 +58,7 @@
    <item row="2" column="1">
     <widget class="QSpinBox" name="spnMinProfileHoleArea">
      <property name="maximum">
-      <number>9999</number>
+      <number>99999</number>
      </property>
     </widget>
    </item>

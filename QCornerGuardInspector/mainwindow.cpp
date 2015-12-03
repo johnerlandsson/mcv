@@ -60,11 +60,21 @@ MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent
     connect( this, SIGNAL( invalid_barcode_alarm() ), &tvAlarmsModel, SLOT( raiseInvalidBarcodeTimeoutAlarm() ) );
     connect( &imgproc, SIGNAL( missingHole() ), &tvAlarmsModel, SLOT( raiseMissingHoleAlarm() ) );
     connect( &imgproc, SIGNAL( invalidProfile() ), &tvAlarmsModel, SLOT( raiseInvalidProfileAlarm() ) );
+    connect( &imgproc, SIGNAL( noHolesInProfile() ), &tvAlarmsModel, SLOT( raiseNoHolesInProfileAlarm() ) );
 
     connect( ui->tabWidget, SIGNAL( currentChanged(int) ), this, SLOT( tab_switched( int ) ) );
 
     //Image source
     imageSource->setProcessFunction( &imgproc );
+
+    //IO
+#ifdef USE_IO
+    io.setup();
+    connect( &tvAlarmsModel, SIGNAL( barcodeRelatedAlarmRaised() ), &io, SLOT( signalBarcodeAlarm() ) );
+    connect( &tvAlarmsModel, SIGNAL( holeRelatedAlarmRaised() ), &io, SLOT( signalHoleAlarm() ) );
+    connect( &updateIoTimer, SIGNAL( timeout() ), &io, SLOT( update() ) );
+    updateIoTimer.start( 100 );
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -96,7 +106,7 @@ void MainWindow::everySecond()
         {
             ui->lcdBarcodeTimeout->display( --barcodeTimeoutCounter );
         }
-        else if( !barcodeTimeoutAlarmRaised )
+        else if( !barcodeTimeoutAlarmRaised && ui->chkBarcodeTimeout->isChecked() )
         {
             emit barcode_timeout_alarm();
             barcodeTimeoutAlarmRaised = true;
@@ -221,6 +231,7 @@ void MainWindow::loadHsThresholdState()
 
 void MainWindow::resetBarcodeTimeoutCounter()
 {
+    barcodeTimeoutAlarmRaised = false;
     barcodeTimeoutCounter = ui->spnBarcodeTimeout->value();
     ui->lcdBarcodeTimeout->display( barcodeTimeoutCounter );
 }
@@ -239,6 +250,7 @@ void MainWindow::on_actionBarcode_triggered()
     if( d.exec() == QDialog::Accepted )
     {
         barcode_settings = d.settings;
+	//TODO set barcode spin box value
         resetBarcodeTimeoutCounter();
         cmbValidBarcodeModel.setStringList( barcode_settings.valid_barcodes );
     }

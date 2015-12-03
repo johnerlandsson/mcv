@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
 #include <QMainWindow>
 #include <QTimer>
 #include <memory>
@@ -12,6 +13,10 @@
 #include "holesettings.h"
 #include <QStringListModel>
 #include "alarmstablemodel.h"
+#include "io.h"
+#ifdef NoError
+#undef NoError
+#endif
 
 
 namespace Ui {
@@ -48,7 +53,6 @@ class MainWindow : public QMainWindow
         void on_actionHole_triggered();
         void validateBarcode( const QString data );
         void tab_switched( int index );
-
         void on_actionShutdown_triggered();
 
     signals:
@@ -59,6 +63,7 @@ class MainWindow : public QMainWindow
         Ui::MainWindow *ui;
         QTimer secondsTimer;
         QTimer imageDisplayTimer;
+	QTimer updateIoTimer;
         int barcodeTimeoutCounter;
         ImageProcessor imgproc;
         BarcodeSettings barcode_settings;
@@ -69,6 +74,9 @@ class MainWindow : public QMainWindow
         AlarmsTableModel tvAlarmsModel;
         P_ImgSrc imageSource;
         bool barcodeTimeoutAlarmRaised;
+#ifdef USE_IO
+        IO io;
+#endif
 };
 
 #endif // MAINWINDOW_H

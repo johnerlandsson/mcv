@@ -5,6 +5,8 @@
 #include <iostream>
 #include <QSqlError>
 
+#include <iostream>
+
 AlarmsTableModel::AlarmsTableModel() : barcodeTimeoutEnabled{ true }, invalidBarcodeEnabled{ true }, missingHoleEnabled{ true }, invalidProfileEnabled{ true }
 {
     db = QSqlDatabase::addDatabase( "QSQLITE" );
@@ -59,6 +61,7 @@ void AlarmsTableModel::createTables()
     q.exec( "INSERT INTO 'alarm_types' (id, msg) VALUES(2, 'Invalid barcode.');" );
     q.exec( "INSERT INTO 'alarm_types' (id, msg) VALUES(3, 'Missing hole.');" );
     q.exec( "INSERT INTO 'alarm_types' (id, msg) VALUES(4, 'Invalid profile.');" );
+    q.exec( "INSERT INTO 'alarm_types' (id, msg) VALUES(5, 'No holes in profile.');" );
 }
 
 int AlarmsTableModel::rowCount( const QModelIndex & ) const
@@ -188,6 +191,9 @@ void AlarmsTableModel::loadData()
 
 void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
 {
+    std::cout << "AlarmsTableModel::raiseBarcodeTimeoutAlarm" << std::endl;
+    emit barcodeRelatedAlarmRaised();
+
     if( !barcodeTimeoutEnabled )
         return;
 
@@ -195,12 +201,12 @@ void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
         incrementLastRepeat();
     else
         addAlarm( BarcodeTimeout );
-
-    emit barcodeRelatedAlarmRaised();
 }
 
 void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
 {
+    emit barcodeRelatedAlarmRaised();
+
     if( !invalidBarcodeEnabled )
         return;
 
@@ -208,12 +214,12 @@ void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
         incrementLastRepeat();
     else
         addAlarm( InvalidBarcode );
-
-    emit barcodeRelatedAlarmRaised();
 }
 
 void AlarmsTableModel::raiseMissingHoleAlarm()
 {
+    emit holeRelatedAlarmRaised();
+
     if( !missingHoleEnabled )
         return;
 
@@ -221,12 +227,13 @@ void AlarmsTableModel::raiseMissingHoleAlarm()
         incrementLastRepeat();
     else
         addAlarm( MissingHole );
-
-    emit holeRelatedAlarmRaised();
 }
 
 void AlarmsTableModel::raiseInvalidProfileAlarm()
 {
+    emit holeRelatedAlarmRaised();
+    emit barcodeRelatedAlarmRaised();
+
     if( !invalidProfileEnabled )
         return;
 
@@ -234,6 +241,19 @@ void AlarmsTableModel::raiseInvalidProfileAlarm()
         incrementLastRepeat();
     else
         addAlarm( InvalidProfile );
+}
+
+void AlarmsTableModel::raiseNoHolesInProfileAlarm()
+{
+    emit holeRelatedAlarmRaised();
+
+    if( !missingHoleEnabled )
+        return;
+
+    if( ids.size() > 0 && typeids.front() == NoHolesInProfile )
+        incrementLastRepeat();
+    else
+        addAlarm( NoHolesInProfile );
 }
 
 void AlarmsTableModel::incrementLastRepeat()

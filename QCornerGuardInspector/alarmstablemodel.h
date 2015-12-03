@@ -24,7 +24,8 @@ class AlarmsTableModel : public QAbstractTableModel
             BarcodeTimeout = 1,
             InvalidBarcode = 2,
             MissingHole = 3,
-            InvalidProfile = 4
+            InvalidProfile = 4,
+            NoHolesInProfile = 5
         };
 
         /* Default constructor
@@ -86,6 +87,7 @@ class AlarmsTableModel : public QAbstractTableModel
         void raiseInvalidBarcodeTimeoutAlarm();
         void raiseMissingHoleAlarm();
         void raiseInvalidProfileAlarm();
+        void raiseNoHolesInProfileAlarm();
 
     private:
         void incrementLastRepeat();
