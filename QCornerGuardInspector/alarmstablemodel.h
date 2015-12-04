@@ -93,6 +93,7 @@ class AlarmsTableModel : public QAbstractTableModel
         void incrementLastRepeat();
         void addAlarm(const AlarmTypes type );
         QString AlarmMessage( const AlarmTypes type ) const;
+        QString dbFilename() const;
 
         QList<QDateTime> timestamps;
         QList<int> repeats;
@@ -103,6 +104,7 @@ class AlarmsTableModel : public QAbstractTableModel
         bool invalidBarcodeEnabled;
         bool missingHoleEnabled;
         bool invalidProfileEnabled;
+        bool noHolesInProfileEnabled;
 
     signals:
         void holeRelatedAlarmRaised();

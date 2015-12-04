@@ -10,7 +10,9 @@
 #include <QProcess>
 #include <QDesktopServices>
 
-MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc ) : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }, imageSource{ imgsrc }, barcodeTimeoutAlarmRaised{ false }
+MainWindow::MainWindow( QWidget *parent, P_ImgSrc imgsrc )
+    : QMainWindow( parent ), ui( new Ui::MainWindow ), barcodeTimeoutCounter{ 0 }, imageSource{ imgsrc },
+      barcodeTimeoutAlarmRaised{ false }, invalidBarcodeCounter{ 0 }
 {
     ui->setupUi( this );
 
@@ -123,6 +125,8 @@ void MainWindow::startProcessing()
     barcodeTimeoutAlarmRaised = false;
     imgproc.setGeneralSettings( general_settings );
     imgproc.setHoleSettings( hole_settings );
+
+    invalidBarcodeCounter = 0;
 
     //Enable/disable alarms
     tvAlarmsModel.setAlarmEnabled( AlarmsTableModel::BarcodeTimeout, ui->chkBarcodeTimeout->isChecked() );
@@ -285,9 +289,22 @@ void MainWindow::validateBarcode( const QString data )
 {
     QString validBarcode = cmbValidBarcodeModel.stringList()[ui->cmbValidBarcode->currentIndex()];
     if( data == validBarcode )
+    {
         resetBarcodeTimeoutCounter();
-    else
-        emit invalid_barcode_alarm();
+        invalidBarcodeCounter = 0;
+    }
+    else if( ui->chkInvalidBarcode->isChecked() )
+    {
+        if( invalidBarcodeCounter >= barcode_settings.n_error_frames )
+        {
+            emit invalid_barcode_alarm();
+            invalidBarcodeCounter = 0;
+        }
+        else
+        {
+            invalidBarcodeCounter++;
+        }
+    }
 
     ui->statusBar->showMessage( QString( "Last barcode: " ) + data );
 }
@@ -308,4 +325,9 @@ void MainWindow::on_actionShutdown_triggered()
         QProcess::startDetached( "shutdown -P now" );
         close();
     }
+}
+
+void MainWindow::on_actionManual_triggered()
+{
+    QDesktopServices::openUrl( QUrl( "/usr/share/doc/QCornerGuardInspector/document.pdf" ) );
 }

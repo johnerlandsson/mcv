@@ -54,6 +54,7 @@ class MainWindow : public QMainWindow
         void validateBarcode( const QString data );
         void tab_switched( int index );
         void on_actionShutdown_triggered();
+        void on_actionManual_triggered();
 
     signals:
         void barcode_timeout_alarm();
@@ -74,6 +75,7 @@ class MainWindow : public QMainWindow
         AlarmsTableModel tvAlarmsModel;
         P_ImgSrc imageSource;
         bool barcodeTimeoutAlarmRaised;
+        int invalidBarcodeCounter;
 #ifdef USE_IO
         IO io;
 #endif

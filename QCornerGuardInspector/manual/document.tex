@@ -21,7 +21,6 @@
 \begin{document}
 
 %Försättsblad
-\pagenumbering{gobble}
 \maketitle
 \vspace{100mm}
 Senast ändrad: \today
@@ -51,7 +50,8 @@ Senast ändrad: \today
 		Man kontrollerar att bilden har rätt mängd ljus genom att föra in en list i kameralådan så att en sträckkod är i bild. Bilden skall vara så ljus att sträckkoden inte flyter ihop, 
 		och så mörk att texten ändå har hög kontrast mot listen. Eftersom att kameran sitter i en låda påverkas inte bilden så mycket utav omgivningens belysning. 
 		Men LED panelens ljus kommer gradvis att bli sämre. Därför är det en god ide att kontrollera detta vid varje uppstart.
-	      }%vbox
+		Öppnar man bländaren för mycket kan man få problem med att bilden blir för
+		ljus. Det blir då svårt att justera tröskelvärdet. }%vbox
 
 	\vbox{\subsection{Aktivering av larm}\label{subsec:activatealarm}
 		\begin{wrapfigure}{R}{3cm}
@@ -191,7 +191,10 @@ Senast ändrad: \today
 		Målet med detta är att få ut en bild som endast innehåller en enfärgad representation av vinkelprofilen. Detta för att möjliggöra att man kan detektera och mäta hålen i profilen.
 		Det är en bra ide att börja med ett lågt värde och gradvis öka tills man har en solid bild av profilen där hålen syns tydligt utan att smälta ihop. \newline
 		Tröskelvärdet justeras genom att välja fliken Setup och dra spaken märkt Threshold i sidled alternativt via Settings->General.
-	      }
+		Om man fortfarande ser fläckar i profilen när man ställt upp tröskelvärdet
+		till sitt max värde betyder det att bländaren släpper in för mycket ljus.
+		Justera då bländaren för att få en mörkare bild (se kapitel
+		\ref{subsec:aperture}). }
 
 	      \subsubsection{Minimal profilarea}\label{subsubsec:min_profile_area}
 	  	Efter det att programmet tagit ett tröskelvärde på bilden försöker det urskilja vilken del av bilden som är vår vinkelprofil. 
@@ -212,6 +215,5 @@ Senast ändrad: \today
 
 \section{Underhåll}
 	LED panelen i kameralådan behöver hållas ren för att undvika felläsning och falsklarm.
-
 
 \end{document}

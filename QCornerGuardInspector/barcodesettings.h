@@ -12,6 +12,7 @@ class BarcodeSettings
 
         QStringList valid_barcodes;
         int timeout_s;
+        int n_error_frames;
 
     private:
         QString valid_barcodes_path;

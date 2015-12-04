@@ -5,7 +5,7 @@
 #include <QRegularExpression>
 #include <QTextStream>
 
-BarcodeSettings::BarcodeSettings() : timeout_s{ 10 }
+BarcodeSettings::BarcodeSettings() : timeout_s{ 10 }, n_error_frames{ 2 }
 {
     QSettings s;
     valid_barcodes_path = s.fileName();
@@ -17,6 +17,7 @@ void BarcodeSettings::load()
 {
     QSettings s;
     timeout_s = s.value( "BarcodeSettings/timeout_s", 10 ).toInt();
+    n_error_frames = s.value( "BarcodeSettings/n_error_frames" ).toInt();
     QFile f( valid_barcodes_path );
     if( f.open( QIODevice::ReadOnly ) )
     {
@@ -30,6 +31,7 @@ void BarcodeSettings::save()
 {
     QSettings s;
     s.setValue( "BarcodeSettings/timeout_s", timeout_s );
+    s.setValue( "BarcodeSettings/n_error_frames", n_error_frames );
 
     QFile f( valid_barcodes_path );
     if( f.open( QIODevice::WriteOnly | QIODevice::Truncate ) )

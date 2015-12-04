@@ -4,13 +4,14 @@
 #include <QSqlError>
 #include <iostream>
 #include <QSqlError>
+#include <QSettings>
 
 #include <iostream>
 
-AlarmsTableModel::AlarmsTableModel() : barcodeTimeoutEnabled{ true }, invalidBarcodeEnabled{ true }, missingHoleEnabled{ true }, invalidProfileEnabled{ true }
+AlarmsTableModel::AlarmsTableModel() : barcodeTimeoutEnabled{ true }, invalidBarcodeEnabled{ true }, missingHoleEnabled{ true }, invalidProfileEnabled{ true }, noHolesInProfileEnabled{ true }
 {
     db = QSqlDatabase::addDatabase( "QSQLITE" );
-    db.setDatabaseName( "QCornerGuardInspector_alarms.db" );
+    db.setDatabaseName( dbFilename() );
     if( !db.open() )
     {
         QString msg = "Failed to open database.\n" + db.lastError().text();
@@ -154,6 +155,8 @@ void AlarmsTableModel::setAlarmEnabled( const AlarmTypes type, const bool enable
         case InvalidProfile:
             invalidProfileEnabled = enabled;
             break;
+        case NoHolesInProfile:
+            noHolesInProfileEnabled = enabled;
         default:
             break;
     }
@@ -191,11 +194,10 @@ void AlarmsTableModel::loadData()
 
 void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
 {
-    std::cout << "AlarmsTableModel::raiseBarcodeTimeoutAlarm" << std::endl;
-    emit barcodeRelatedAlarmRaised();
-
     if( !barcodeTimeoutEnabled )
         return;
+
+    emit barcodeRelatedAlarmRaised();
 
     if( ids.size() > 0 && typeids.front() == BarcodeTimeout )
         incrementLastRepeat();
@@ -205,10 +207,10 @@ void AlarmsTableModel::raiseBarcodeTimeoutAlarm()
 
 void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
 {
-    emit barcodeRelatedAlarmRaised();
-
     if( !invalidBarcodeEnabled )
         return;
+
+    emit barcodeRelatedAlarmRaised();
 
     if( ids.size() > 0 && typeids.front() == InvalidBarcode )
         incrementLastRepeat();
@@ -218,10 +220,10 @@ void AlarmsTableModel::raiseInvalidBarcodeTimeoutAlarm()
 
 void AlarmsTableModel::raiseMissingHoleAlarm()
 {
-    emit holeRelatedAlarmRaised();
-
     if( !missingHoleEnabled )
         return;
+
+    emit holeRelatedAlarmRaised();
 
     if( ids.size() > 0 && typeids.front() == MissingHole )
         incrementLastRepeat();
@@ -231,11 +233,11 @@ void AlarmsTableModel::raiseMissingHoleAlarm()
 
 void AlarmsTableModel::raiseInvalidProfileAlarm()
 {
-    emit holeRelatedAlarmRaised();
-    emit barcodeRelatedAlarmRaised();
-
     if( !invalidProfileEnabled )
         return;
+
+    emit holeRelatedAlarmRaised();
+    emit barcodeRelatedAlarmRaised();
 
     if( ids.size() > 0 && typeids.front() == InvalidProfile )
         incrementLastRepeat();
@@ -245,10 +247,10 @@ void AlarmsTableModel::raiseInvalidProfileAlarm()
 
 void AlarmsTableModel::raiseNoHolesInProfileAlarm()
 {
-    emit holeRelatedAlarmRaised();
-
-    if( !missingHoleEnabled )
+    if( !noHolesInProfileEnabled )
         return;
+
+    emit holeRelatedAlarmRaised();
 
     if( ids.size() > 0 && typeids.front() == NoHolesInProfile )
         incrementLastRepeat();
@@ -296,8 +298,22 @@ QString AlarmsTableModel::AlarmMessage( const AlarmTypes type ) const
         case MissingHole:
             return QString( "Missing hole" );
         case InvalidProfile:
-            return QString( "Invlid profile" );
+            return QString( "Invalid profile" );
         default:
             return QString();
     }
+}
+
+QString AlarmsTableModel::dbFilename() const
+{
+    QSettings s;
+
+    QStringList lst = s.fileName().split( '/' );
+    QString ret;
+    for( auto i = 0; i < lst.size() - 1; i++ )
+        ret += lst[i] + "/";
+
+    ret += "QCornerGuardInspector_alarms.db";
+
+    return ret;
 }
